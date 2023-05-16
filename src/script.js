@@ -35,6 +35,12 @@ let num = 0
 //geometry
 const torusGeometry = new THREE.TorusGeometry( 0.3, 0.2, 20, 45 ); 
 
+const cubeGeometry = new THREE.BoxGeometry(0.2,0.2,0.2)
+
+//Array of donuts
+let donuts = []
+let colorArr = [0xe02f64,0x1b9fe0,'yellow','orange','pink',0x62b579]
+
 //material 
 const material = new THREE.MeshMatcapMaterial({matcap:matcapTexture1})
 
@@ -84,8 +90,14 @@ fontLoader.load(
         const text = new THREE.Mesh(textGeometry, material)
         scene.add(text)
 
-        for(let i = 0; i < 100; i++){
+        for(let i = 0; i < 50; i++){
+            //generate random number
+            const randomNumber = Math.floor(Math.random() * colorArr.length);
+            const randomMaterial = new THREE.MeshBasicMaterial({color:colorArr[randomNumber]})
             const donut = new THREE.Mesh(torusGeometry,material)
+            const cube = new THREE.Mesh(cubeGeometry,randomMaterial)
+            
+            donuts.push(donut,cube)
 
             donut.position.x = (Math.random() - 0.5) * 10
             donut.position.y = (Math.random() - 0.5) * 10
@@ -97,7 +109,16 @@ fontLoader.load(
             const scale = Math.random()
 
             donut.scale.set(scale,scale,scale) 
-            scene.add(donut)
+
+            cube.position.x = (Math.random() - 0.5) * 10
+            cube.position.y = (Math.random() - 0.5) * 5
+            cube.position.z = (Math.random() - 0.5) * 5
+
+            cube.rotation.x = Math.random() * Math.PI
+            cube.rotation.z = Math.random() * Math.PI
+
+
+            scene.add(donut,cube)
         }
 
 
@@ -158,6 +179,12 @@ const clock = new THREE.Clock()
 const tick = () =>
 {
     const elapsedTime = clock.getElapsedTime()
+
+    //Animate each donut
+    donuts.forEach((donut,index) => {
+        donut.rotation.x = Math.sin(elapsedTime * (0.002 * index))
+        donut.position.y = Math.sin(elapsedTime * (0.002 * (index % 2 ? -index : index)))
+    })
     // Update controls
     controls.update()
 
